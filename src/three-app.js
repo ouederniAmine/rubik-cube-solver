@@ -369,8 +369,6 @@ const threeApp = () => {
     createUiPieces()
 
     animate()
-    scramble()
-
     const onDocumentKeyDownHandler = e => {
       if (e.altKey || e.ctrlKey || e.metaKey || e.ShiftKey) return
       switch (e.key) {
