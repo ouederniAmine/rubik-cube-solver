@@ -5,6 +5,16 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import * as L from "./logic"
 import * as U from "./logic/utils"
 
+/*
+here's where i will put the explanation of every function in the three-app.js file:
+- init: this function is called when the page is loaded, it creates the scene, the camera, the renderer, the controls, the lights, the objects, the event listeners, and the animation loop
+- animate: this function is called every frame, it updates the camera, the controls, the lights, the objects, and the renderer
+- recreateUiPieces : it scambles the rubik cube
+- lookupColorForFaceNormal : this function is called when the user changes the color of the ui pieces, it returns the color of the ui pieces
+ i think that reset ui pieces is given a cube and it render the  new cube
+- scramble : it makes a random cube then it solves it 
+axes : green = x; 
+*/ 
 const url = new URL(document.location)
 const searchParams = url.searchParams
 
@@ -119,12 +129,18 @@ const threeApp = () => {
     })
 
   const lookupColorForFaceNormal = (piece, normalX, normalY, normalZ) => {
+    
     if (U.closeTo(normalY, 1)) return COLOR_TABLE[piece.faces.up]
     if (U.closeTo(normalY, -1)) return COLOR_TABLE[piece.faces.down]
     if (U.closeTo(normalX, -1)) return COLOR_TABLE[piece.faces.left]
     if (U.closeTo(normalX, 1)) return COLOR_TABLE[piece.faces.right]
     if (U.closeTo(normalZ, 1)) return COLOR_TABLE[piece.faces.front]
     if (U.closeTo(normalZ, -1)) return COLOR_TABLE[piece.faces.back]
+    return COLOR_TABLE["-"]
+  }
+  const lookupColorWhite = (piece, normalX, normalY, normalZ) => {
+    if (U.closeTo(normalY, 1) ||U.closeTo(normalY, -1) || U.closeTo(normalX, -1)|| U.closeTo(normalX, 1)|| U.closeTo(normalZ, 1)|| U.closeTo(normalZ, -1)) return COLOR_TABLE["B"]
+   
     return COLOR_TABLE["-"]
   }
 
@@ -140,16 +156,14 @@ const threeApp = () => {
       const normalX = normalAttribute.array[arrayIndex++]
       const normalY = normalAttribute.array[arrayIndex++]
       const normalZ = normalAttribute.array[arrayIndex++]
-
+   
       const color = lookupColorForFaceNormal(piece, normalX, normalY, normalZ)
-
       colors.push(color.r, color.g, color.b)
       colors.push(color.r, color.g, color.b)
       colors.push(color.r, color.g, color.b)
     }
 
     pieceGeoemtry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3))
-
     return pieceGeoemtry
   }
 
@@ -164,6 +178,25 @@ const threeApp = () => {
       globals.puzzleGroup.add(uiPiece)
     })
   }
+
+  const createUiPiecesWhite = () => {
+    globals.cube.forEach(piece => {
+      const uiPiece = createWhitePiece(piece)
+      globals.puzzleGroup.add(uiPiece)
+    })
+  }
+
+  const createWhitePiece = piece => {
+
+  const pieceGeometryWithColors = setGeometrywhite(piece)
+    const uiPiece = new THREE.Mesh(pieceGeometryWithColors, PIECE_MATERIAL)
+    uiPiece.scale.set(0.5, 0.5, 0.5)
+    uiPiece.userData = piece.id
+    resetUiPiece(uiPiece, piece)
+    return uiPiece
+
+  }
+
 
   const createUiPiece = piece => {
     const pieceGeometryWithColors = setGeometryVertexColors(piece)
@@ -192,7 +225,46 @@ const threeApp = () => {
       resetUiPiece(uiPiece, piece)
     })
   }
+//function to input cube colors from user
+  const inputCube = (cube) => {
+    //still figuring out how to get the colors from the user
+    createUiPiecesWhite()
+  }
 
+  const setGeometrywhite = (piece) => {
+    const pieceGeoemtry = globals.pieceGeometry.clone()
+    const normalAttribute = pieceGeoemtry.getAttribute("normal")
+
+    const colors = []
+
+    for (let normalIndex = 0; normalIndex < normalAttribute.count; normalIndex += 3) {
+
+      let arrayIndex = normalIndex * normalAttribute.itemSize
+      const normalX = normalAttribute.array[arrayIndex++]
+      const normalY = normalAttribute.array[arrayIndex++]
+      const normalZ = normalAttribute.array[arrayIndex++]
+      
+      if ((piece.x ==0 && piece.y ==1 && piece.z ==0 ) || (piece.x ==0 && piece.y ==-1 && piece.z ==0 ) || (piece.x ==-1 && piece.y ==0 && piece.z ==0 ) || (piece.x ==1 && piece.y ==0 && piece.z ==0 ) || (piece.x ==0 && piece.y ==0 && piece.z ==1 ) || (piece.x ==0 && piece.y ==0 && piece.z ==-1 ))  {   
+        const color = lookupColorForFaceNormal(piece, normalX, normalY, normalZ)
+        colors.push(color.r, color.g, color.b)
+        colors.push(color.r, color.g, color.b)
+        colors.push(color.r, color.g, color.b) 
+      }
+      else{
+        const color = lookupColorWhite(piece, normalX, normalY, normalZ)
+        colors.push(color.r, color.g, color.b)
+        colors.push(color.r, color.g, color.b)
+        colors.push(color.r, color.g, color.b)
+       
+      }
+  
+      const orange = new THREE.Color("darkorange")
+      
+    }
+
+    pieceGeoemtry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3))
+    return pieceGeoemtry
+  }
   const animate = () => {
     window.requestAnimationFrame(animate)
     globals.controls.update()
@@ -287,10 +359,11 @@ const threeApp = () => {
       globals.camera.lookAt(new THREE.Vector3(0, 0, 0))
       recreateUiPieces()
     }
-
+    // here i will put the logic of the moves
     const randomMoves = U.range(NUM_RANDOM_MOVES).map(() => L.getRandomMove(globals.cubeSize))
     L.removeRedundantMoves(randomMoves)
     console.log(`random moves: ${randomMoves.map(move => move.id).join(" ")}`)
+    console.log(L.getSolvedCube(globals.cubeSize))
     globals.cube = L.makeMoves(randomMoves, L.getSolvedCube(globals.cubeSize))
     resetUiPieces(globals.cube)
     setTimeout(showSolutionByCheating, BEFORE_DELAY, randomMoves)
@@ -367,15 +440,11 @@ const threeApp = () => {
     globals.cube = L.getSolvedCube(globals.cubeSize)
     globals.pieceGeometry = await loadGeometry("/rubiks-cube/cube-bevelled.glb")
     createUiPieces()
-
+    setCubeSize(3)
     animate()
     const onDocumentKeyDownHandler = e => {
       if (e.altKey || e.ctrlKey || e.metaKey || e.ShiftKey) return
       switch (e.key) {
-        case '2': return setCubeSize(2)
-        case '3': return setCubeSize(3)
-        case '4': return setCubeSize(4)
-        case '5': return setCubeSize(5)
         case 'a': return toggleAxes()
         case 'r': return toggleAutoRotate()
         default: return
@@ -390,6 +459,7 @@ const threeApp = () => {
     globals.scene.add(globals.axesHelper)
   }
 
+  
   const removeAxesHelper = () => {
     globals.scene.remove(globals.axesHelper)
     globals.axesHelper = undefined
@@ -398,6 +468,7 @@ const threeApp = () => {
   const setCubeSize = value => {
     globals.cubeSizeChanged = value !== globals.cubeSize
     globals.cubeSize = value
+
     emitSettingsChanged()
   }
 
@@ -439,8 +510,9 @@ const threeApp = () => {
     setAutoRotate,
     setAutoRotateSpeed,
     setAxesEnabled,
-    getSettings
+    getSettings,
+    inputCube
   }
 }
 
-export default threeApp
+export default threeApp; 

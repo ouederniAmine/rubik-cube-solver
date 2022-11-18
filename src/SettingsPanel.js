@@ -3,7 +3,6 @@ import { Divider, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, S
 import CloseIcon from "@mui/icons-material/Close"
 import { StyledSettingsPanel, StyledSettingsPanelHeader, StyledSettingsPanelBody } from "./SettingsPanel.styles"
 import { useThreeAppActions } from "./context"
-
 const CubeSizeSetting = ({ value, setValue }) => {
 
   const handleChange = event => {
@@ -157,6 +156,7 @@ const SettingsPanel = ({ onClose }) => {
         <AnimationSpeedSetting value={settings.animationSpeed} setValue={threeAppActions.setAnimationSpeed} />
         <AutoRotateSetting value={settings.autoRotate} setValue={threeAppActions.setAutoRotate} />
         <AutoRotateSpeedSetting value={settings.autoRotateSpeed} setValue={threeAppActions.setAutoRotateSpeed} />
+        <button onClick={() => threeAppActions.inputCube() }>yes</button>
         <AxesEnabledSetting value={settings.axesEnabled} setValue={threeAppActions.setAxesEnabled} />
       </StyledSettingsPanelBody>
     </StyledSettingsPanel>
