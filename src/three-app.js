@@ -4,6 +4,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader"
 import * as L from "./logic"
 import * as U from "./logic/utils"
+import  { useState } from 'react';
+import { pi } from "mathjs"
 
 /*
 here's where i will put the explanation of every function in the three-app.js file:
@@ -17,6 +19,8 @@ axes : green = x;
 */ 
 const url = new URL(document.location)
 const searchParams = url.searchParams
+let colors = []
+let piecesColors = ["B", "B", "B","B", "B", "B","B", "B", "B","B", "B", "B","B", "B", "B","B", "B", "B","B", "B", "B","B", "B", "B","B", "B"];
 
 const queryParamInt = (paramName, min, max, defaultValue) => {
   const clamp = v => {
@@ -130,20 +134,25 @@ const threeApp = () => {
 
   const lookupColorForFaceNormal = (piece, normalX, normalY, normalZ) => {
     
-    if (U.closeTo(normalY, 1)) return COLOR_TABLE[piece.faces.up]
-    if (U.closeTo(normalY, -1)) return COLOR_TABLE[piece.faces.down]
-    if (U.closeTo(normalX, -1)) return COLOR_TABLE[piece.faces.left]
-    if (U.closeTo(normalX, 1)) return COLOR_TABLE[piece.faces.right]
-    if (U.closeTo(normalZ, 1)) return COLOR_TABLE[piece.faces.front]
-    if (U.closeTo(normalZ, -1)) return COLOR_TABLE[piece.faces.back]
+    if (U.closeTo(normalY, 1)){ piecesColors[piece.id] = piece.faces.up;return COLOR_TABLE[piece.faces.up]}
+    if (U.closeTo(normalY, -1)){piecesColors[piece.id] = piece.faces.down ;return COLOR_TABLE[piece.faces.down]}
+    if (U.closeTo(normalX, -1)){piecesColors[piece.id] = piece.faces.left  ;return COLOR_TABLE[piece.faces.left]}
+    if (U.closeTo(normalX, 1)) {piecesColors[piece.id] = piece.faces.right ;return COLOR_TABLE[piece.faces.right]}
+    if (U.closeTo(normalZ, 1)) {piecesColors[piece.id] = piece.faces.front ;return COLOR_TABLE[piece.faces.front]}
+    if (U.closeTo(normalZ, -1)) {piecesColors[piece.id] = piece.faces.back ;return COLOR_TABLE[piece.faces.back]}
     return COLOR_TABLE["-"]
   }
-  const lookupColorWhite = (piece, normalX, normalY, normalZ) => {
-    if (U.closeTo(normalY, 1) ||U.closeTo(normalY, -1) || U.closeTo(normalX, -1)|| U.closeTo(normalX, 1)|| U.closeTo(normalZ, 1)|| U.closeTo(normalZ, -1)) return COLOR_TABLE["B"]
+  const lookupColorWhite = (piece,color, normalX, normalY, normalZ) => {
+    if (U.closeTo(normalY, 1) ||U.closeTo(normalY, -1) || U.closeTo(normalX, -1)|| U.closeTo(normalX, 1)|| U.closeTo(normalZ, 1)|| U.closeTo(normalZ, -1)) { piecesColors[piece.id] =  "B";  return COLOR_TABLE[piecesColors[piece.id]]}
    
     return COLOR_TABLE["-"]
   }
-
+  const lookupColor = (piece,colorName, normalX, normalY, normalZ) => {
+    if (U.closeTo(normalY, 1) ||U.closeTo(normalY, -1) || U.closeTo(normalX, -1)|| U.closeTo(normalX, 1)|| U.closeTo(normalZ, 1)|| U.closeTo(normalZ, -1)) { piecesColors[piece.id] =  colorName;  return COLOR_TABLE[piecesColors[piece.id]]}
+   
+    return COLOR_TABLE["-"]
+  }
+  
   const setGeometryVertexColors = (piece) => {
     const pieceGeoemtry = globals.pieceGeometry.clone()
     const normalAttribute = pieceGeoemtry.getAttribute("normal")
@@ -162,11 +171,28 @@ const threeApp = () => {
       colors.push(color.r, color.g, color.b)
       colors.push(color.r, color.g, color.b)
     }
-
     pieceGeoemtry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3))
     return pieceGeoemtry
   }
 
+  const setNewGeometryVertexColor = (piece,colorName) => {
+    const pieceGeoemtry = globals.pieceGeometry.clone()
+    const normalAttribute = pieceGeoemtry.getAttribute("normal")
+
+     colors = []
+    for (let normalIndex = 0; normalIndex < normalAttribute.count; normalIndex += 3) {
+      let arrayIndex = normalIndex * normalAttribute.itemSize
+      const normalX = normalAttribute.array[arrayIndex++]
+      const normalY = normalAttribute.array[arrayIndex++]
+      const normalZ = normalAttribute.array[arrayIndex++]
+      const ncolor = lookupColor(piece, colorName, normalX, normalY, normalZ )
+      colors.push(ncolor.r, ncolor.g, ncolor.b)
+      colors.push(ncolor.r, ncolor.g, ncolor.b)
+      colors.push(ncolor.r, ncolor.g, ncolor.b)
+    }
+    pieceGeoemtry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3))
+    return pieceGeoemtry
+  }
   const recreateUiPieces = () => {
     globals.cube = L.getSolvedCube(globals.cubeSize)
     createUiPieces()
@@ -181,26 +207,48 @@ const threeApp = () => {
 
   const createUiPiecesWhite = () => {
     globals.cube.forEach(piece => {
-      const uiPiece = createWhitePiece(piece)
+      const color = COLOR_TABLE[piecesColors[piece.id]];
+      const uiPiece = createWhitePiece(piece ,color)
       globals.puzzleGroup.add(uiPiece)
+    
+
     })
+    console.log(piecesColors)
+  }
+  const createUiPiecesInput = () => {
+    globals.cube.forEach(piece => {
+      console.log(piecesColors[piece.id])
+      const uiPiece = createPiece(piece ,piecesColors[piece.id])
+      globals.puzzleGroup.add(uiPiece)
+
+    })
+    console.log(piecesColors)
   }
 
-  const createWhitePiece = piece => {
+  const createWhitePiece = (piece , color)=> {
 
-  const pieceGeometryWithColors = setGeometrywhite(piece)
+  const pieceGeometryWithColors = setGeometrywhite( piece , color)
     const uiPiece = new THREE.Mesh(pieceGeometryWithColors, PIECE_MATERIAL)
     uiPiece.scale.set(0.5, 0.5, 0.5)
     uiPiece.userData = piece.id
     resetUiPiece(uiPiece, piece)
     return uiPiece
-
   }
+  const createPiece = (piece , colorName)=> {
 
+    const pieceGeometryWithColors = setNewGeometryVertexColor( piece , colorName)
+      const uiPiece = new THREE.Mesh(pieceGeometryWithColors, PIECE_MATERIAL)
+      uiPiece.scale.set(0.5, 0.5, 0.5)
+      uiPiece.userData = piece.id
+      resetUiPiece(uiPiece, piece)
+      return uiPiece
+    }
+ 
 
   const createUiPiece = piece => {
     const pieceGeometryWithColors = setGeometryVertexColors(piece)
     const uiPiece = new THREE.Mesh(pieceGeometryWithColors, PIECE_MATERIAL)
+
     uiPiece.scale.set(0.5, 0.5, 0.5)
     uiPiece.userData = piece.id
     resetUiPiece(uiPiece, piece)
@@ -220,22 +268,27 @@ const threeApp = () => {
     globals.puzzleGroup.children.find(child => child.userData === piece.id)
 
   const resetUiPieces = cube => {
+    console.log("resetUiPieces")
     cube.forEach(piece => {
       const uiPiece = findUiPiece(piece)
       resetUiPiece(uiPiece, piece)
     })
   }
 //function to input cube colors from user
-  const inputCube = (cube) => {
+  const inputCube = () => {
     //still figuring out how to get the colors from the user
-    createUiPiecesWhite()
+    createUiPiecesInput()
+    //createUiPiecesinput()
   }
+  const emptycube = () => {    createUiPiecesWhite()}
 
-  const setGeometrywhite = (piece) => {
+ 
+
+
+  const setGeometrywhite = (piece , piececolor) => {
     const pieceGeoemtry = globals.pieceGeometry.clone()
     const normalAttribute = pieceGeoemtry.getAttribute("normal")
-
-    const colors = []
+    colors = []
 
     for (let normalIndex = 0; normalIndex < normalAttribute.count; normalIndex += 3) {
 
@@ -251,17 +304,14 @@ const threeApp = () => {
         colors.push(color.r, color.g, color.b) 
       }
       else{
-        const color = lookupColorWhite(piece, normalX, normalY, normalZ)
+        const color = lookupColorWhite(piece,piececolor,normalX, normalY, normalZ)
         colors.push(color.r, color.g, color.b)
         colors.push(color.r, color.g, color.b)
         colors.push(color.r, color.g, color.b)
        
-      }
-  
-      const orange = new THREE.Color("darkorange")
-      
+      }      
     }
-
+    
     pieceGeoemtry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3))
     return pieceGeoemtry
   }
@@ -298,6 +348,30 @@ const threeApp = () => {
     return new THREE.AnimationClip(move.id, duration, tracks)
   }
 
+  const setColor = (piece , color) => {
+
+    const pieceGeoemtry = globals.pieceGeometry.clone()
+    const normalAttribute = pieceGeoemtry.getAttribute("normal")
+
+    colors = []
+
+    for (let normalIndex = 0; normalIndex < normalAttribute.count; normalIndex += 3) {
+
+      let arrayIndex = normalIndex * normalAttribute.itemSize
+      const normalX = normalAttribute.array[arrayIndex++]
+      const normalY = normalAttribute.array[arrayIndex++]
+      const normalZ = normalAttribute.array[arrayIndex++]
+   
+      const color = lookupColorForFaceNormal(piece, normalX, normalY, normalZ)
+      colors.push(color.r, color.g, color.b)
+      colors.push(color.r, color.g, color.b)
+      colors.push(color.r, color.g, color.b)
+    }
+
+    pieceGeoemtry.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3))
+    return pieceGeoemtry
+
+  }
   const animateMoves = (moves, nextMoveIndex = 0) => {
 
     if (globals.cubeSizeChanged) {
@@ -511,7 +585,8 @@ const threeApp = () => {
     setAutoRotateSpeed,
     setAxesEnabled,
     getSettings,
-    inputCube
+    inputCube,
+    emptycube
   }
 }
 
