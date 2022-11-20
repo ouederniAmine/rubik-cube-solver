@@ -23,10 +23,14 @@ const ColorInputPanel = ({ onClose }) => {
   const threeAppActions = useThreeAppActions()
   const [settings, setSettings] = useState(threeAppActions.getSettings)
   const [color , setColor] = useState(settings.color)
+  const resetCube = () => {
+    threeAppActions.emptycube()
+  }
   const resetToogle = () => {
     threeAppActions.setInputState(false)
   }
   const handleToogleChange = (event, newView) => {
+    threeAppActions.setInputState(true)
     threeAppActions.setColor(newView)
   }
   useEffect(() => {
@@ -80,6 +84,7 @@ const ColorInputPanel = ({ onClose }) => {
       </ToggleButton>
     </ToggleButtonGroup>
     <br></br>
+    <Button size="large" onClick={resetCube}>Empty Cube</Button>
     <Button size="large" onClick={resetToogle}>Done</Button>
 
       </StyledSettingsPanelBody>

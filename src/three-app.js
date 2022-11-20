@@ -508,6 +508,7 @@ const threeApp = () => {
       const uiPiece = createUiPiece(piece);
       globals.puzzleGroup.add(uiPiece);
     });
+    console.log(piecesColors);
   };
 
   const createUiPiecesWhite = () => {
@@ -579,6 +580,7 @@ const threeApp = () => {
     //still figuringid out how to get the colors from the user
     id --;
     var color = ""
+    console.log(id);
     switch(globals.color){
       case "white":
         color = "B";
@@ -598,9 +600,41 @@ const threeApp = () => {
       default:
         color = "F";
         break;}
-    addColor(id, color , normal);
-    createUiPiecesInput();  
+     const newId = id + 1;   
+     if (newId !== 5 && newId !==11&& newId !==13 && newId !==14 && newId!==16 && newId !==22 ){
+      addColor(id, color , normal);
+      createUiPiecesInput();  }   
+    
   };
+  const getColorsForInput = () => {
+    var out =""
+   const outL = piecesColors[6].back + piecesColors[3].back + piecesColors[0].back + piecesColors[14].back+ piecesColors[12].back+ piecesColors[9].back+ piecesColors[23].back+ piecesColors[20].back+piecesColors[17].back
+    const outF = piecesColors[8].left+ piecesColors[5].left + piecesColors[2].left+ piecesColors[7].left+ piecesColors[4].left+ piecesColors[1].left+ piecesColors[6].left+ piecesColors[3].left+ piecesColors[0].left
+  const outR = piecesColors[25].front+ piecesColors[22].front + piecesColors[19].front+ piecesColors[16].front+ piecesColors[13].front+ piecesColors[11].front+ piecesColors[8].front+ piecesColors[5].front+ piecesColors[2].front
+    const outB= piecesColors[23].right+ piecesColors[20].right + piecesColors[17].right+ piecesColors[24].right+ piecesColors[21].right+ piecesColors[18].right+ piecesColors[25].right+ piecesColors[22].right+ piecesColors[19].right
+    const outD = piecesColors[0].down+ piecesColors[1].down + piecesColors[2].down+ piecesColors[9].down+ piecesColors[10].down+ piecesColors[11].down+ piecesColors[17].down+ piecesColors[18].down+ piecesColors[19].down
+    const outU = piecesColors[8].up+ piecesColors[7].up + piecesColors[6].up+ piecesColors[16].up+ piecesColors[15].up+ piecesColors[14].up+ piecesColors[25].up+ piecesColors[24].up+ piecesColors[23].up
+  out = outL + outF + outR + outB + outD + outU;
+ 
+  for (let i = 0; i < out.length; i++) {
+    if (out[i] === "B") {
+      out = out.replace("B", "w");
+
+    }
+    if (out[i] === "U") {
+      out = out.replace("U", "b");    }
+    if (out[i] === "D") {
+      out = out.replace("D", "g");    }
+    if (out[i] === "L") {
+      out = out.replace("L", "r");    }
+    if (out[i] === "R" ) {
+      out = out.replace("R", "o");    }
+    if (out[i] === "F") {
+      out = out.replace("F", "y");    }
+  }
+  console.log(outR);
+    return out;
+  }
   const addColor = (pieceId, colorName , normal) => {
   const normalY = normal.y;
   const normalX = normal.x;
@@ -692,6 +726,7 @@ const threeApp = () => {
   };
  
   function onClick(event) {
+    console.log(getColorsForInput());
     if(globals.input){
     raycaster.setFromCamera(pointer, globals.camera);
     let intersects = raycaster.intersectObjects(globals.scene.children);
@@ -709,8 +744,7 @@ const threeApp = () => {
   };
   function onPointerMove( event ) {
 
-    // calculate pointer position in normalized device coordinates
-    // (-1 to +1) for both components
+
   
     pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
     pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
@@ -829,7 +863,7 @@ const threeApp = () => {
     globals.renderer.setPixelRatio(window.devicePixelRatio);
     globals.renderer.setSize(w, h);
     container.appendChild(globals.renderer.domElement);
-    globals.input = true;
+    globals.input = false;
     window.addEventListener("resize", () => {
       globals.renderer.setSize(container.offsetWidth, container.offsetHeight);
       globals.camera.aspect = container.offsetWidth / container.offsetHeight;

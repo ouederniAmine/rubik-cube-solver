@@ -156,8 +156,6 @@ const SettingsPanel = ({ onClose }) => {
         <AnimationSpeedSetting value={settings.animationSpeed} setValue={threeAppActions.setAnimationSpeed} />
         <AutoRotateSetting value={settings.autoRotate} setValue={threeAppActions.setAutoRotate} />
         <AutoRotateSpeedSetting value={settings.autoRotateSpeed} setValue={threeAppActions.setAutoRotateSpeed} />
-        <button onClick={() => threeAppActions.emptycube()}>empty</button>
-        <button onClick={() => threeAppActions.inputCube() }>input</button>
         <AxesEnabledSetting value={settings.axesEnabled} setValue={threeAppActions.setAxesEnabled} />
       </StyledSettingsPanelBody>
     </StyledSettingsPanel>
