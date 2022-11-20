@@ -5,8 +5,9 @@ import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as L from "./logic";
 import * as U from "./logic/utils";
 import { useState } from "react";
-import { pi } from "mathjs";
+import { norm, pi } from "mathjs";
 import MouseMeshInteraction from "./three_mmi"
+import { CasesSharp } from "@mui/icons-material";
 /*
 here's where i will put the explanation of every function in the three-app.js file:
 - init: this function is called when the page is loaded, it creates the scene, the camera, the renderer, the controls, the lights, the objects, the event listeners, and the animation loop
@@ -281,7 +282,8 @@ const threeApp = () => {
     cubeSizeChanged: true,
     animationSpeed: 750,
     axesEnabled: false,
-    mmi : undefined,
+    color : undefined,
+    input : undefined,
   };
 
   const SETTINGS_CHANGED_EVENT_NAME = "settings-changed";
@@ -303,6 +305,8 @@ const threeApp = () => {
       autoRotate: globals.controls.autoRotate,
       autoRotateSpeed: globals.controls.autoRotateSpeed,
       axesEnabled: globals.axesEnabled,
+      color: globals.color,
+      input: globals.input,
     };
   };
 
@@ -346,7 +350,10 @@ const threeApp = () => {
   };
 
  
-
+  const setInputState = (input) => {
+    globals.input = input;
+    emitSettingsChanged();
+  }
 
   const loadGeometry = (url) =>
     new Promise((resolve, reject) => {
@@ -409,32 +416,26 @@ const threeApp = () => {
 
     return COLOR_TABLE["-"];
   };
-  const lookupColor = (piece, colorName, normalX, normalY, normalZ) => {
+  const lookupColor = (piece, normalX, normalY, normalZ) => {
     if (U.closeTo(normalY, 1)) {
-      piecesColors[piece.id].up = colorName.up;
-      return COLOR_TABLE[colorName.up];
+      return COLOR_TABLE[piecesColors[piece.id].up];
     }
     if (U.closeTo(normalY, -1)) {
-      piecesColors[piece.id].down = colorName.down;
-      return  COLOR_TABLE[colorName.down];
+      return  COLOR_TABLE[piecesColors[piece.id].down];
     }
     if (U.closeTo(normalX, -1)) {
-      piecesColors[piece.id].left = colorName.left;
-      return COLOR_TABLE[colorName.left];
+      return COLOR_TABLE[piecesColors[piece.id].left];
     }
     if (U.closeTo(normalX, 1)) {
-      piecesColors[piece.id].right = colorName.right;
-      return COLOR_TABLE[colorName.right];
+      return COLOR_TABLE[piecesColors[piece.id].right];
     }
     if (U.closeTo(normalZ, 1)) {
-      piecesColors[piece.id].front = colorName.front;
-      return  COLOR_TABLE[colorName.front];
+      return  COLOR_TABLE[piecesColors[piece.id].front];
     }
     if (U.closeTo(normalZ, -1)) {
-      piecesColors[piece.id].back = colorName.back;
-      return  COLOR_TABLE[colorName.back];
+     
+      return  COLOR_TABLE[piecesColors[piece.id].back];
     }
-
     return COLOR_TABLE["-"];
   };
 
@@ -472,7 +473,7 @@ const threeApp = () => {
     return pieceGeoemtry;
   };
 
-  const setNewGeometryVertexColor = (piece, colorName) => {
+  const setNewGeometryVertexColor = (piece) => {
     const pieceGeoemtry = globals.pieceGeometry.clone();
     const normalAttribute = pieceGeoemtry.getAttribute("normal");
 
@@ -486,8 +487,7 @@ const threeApp = () => {
       const normalX = normalAttribute.array[arrayIndex++];
       const normalY = normalAttribute.array[arrayIndex++];
       const normalZ = normalAttribute.array[arrayIndex++];
-
-      const ncolor = lookupColor(piece, colorName, normalX, normalY, normalZ);
+      const ncolor = lookupColor(piece, normalX, normalY, normalZ);
       colors.push(ncolor.r, ncolor.g, ncolor.b);
       colors.push(ncolor.r, ncolor.g, ncolor.b);
       colors.push(ncolor.r, ncolor.g, ncolor.b);
@@ -517,12 +517,13 @@ const threeApp = () => {
       globals.puzzleGroup.add(uiPiece);
     });
   };
-  const createUiPiecesInput = (pieceId , colorName) => {
+  const createUiPiecesInput = () => {
     globals.cube.forEach((piece) => {
-      const uiPiece = createPiece(piece, piecesColors[piece.id]);
+      const uiPiece = createPiece(piece);
       globals.puzzleGroup.add(uiPiece);
     });
   };
+  
 
   const createWhitePiece = (piece, color) => {
     const pieceGeometryWithColors = setGeometrywhite(piece, color);
@@ -534,11 +535,10 @@ const threeApp = () => {
     resetUiPiece(uiPiece, piece);
     return uiPiece;
   };
-  const createPiece = (piece, colorName) => {
-    const pieceGeometryWithColors = setNewGeometryVertexColor(piece, colorName);
+  const createPiece = (piece) => {
+    const pieceGeometryWithColors = setNewGeometryVertexColor(piece);
     const uiPiece = new THREE.Mesh(pieceGeometryWithColors, PIECE_MATERIAL);
     uiPiece.name = "piece";
-
     uiPiece.scale.set(0.5, 0.5, 0.5);
     uiPiece.userData = piece.id;
     resetUiPiece(uiPiece, piece);
@@ -575,20 +575,60 @@ const threeApp = () => {
     });
   };
   //function to input cube colors from user
-  const inputCube = (id) => {
+  const inputCube = (id , normal) => {
     //still figuringid out how to get the colors from the user
-    console.log(id)
-    addNewPiece(0, "L");
-    createUiPiecesInput();
-    //createUiPiecesinput()
+    id --;
+    var color = ""
+    switch(globals.color){
+      case "white":
+        color = "B";
+        break;
+      case "blue":
+        color = "U";
+        break;
+      case "green":
+        color = "D";
+        break;
+      case "red":
+        color = "L";
+        break;
+      case "orange":
+        color = "R";
+        break;
+      default:
+        color = "F";
+        break;}
+    addColor(id, color , normal);
+    createUiPiecesInput();  
   };
+  const addColor = (pieceId, colorName , normal) => {
+  const normalY = normal.y;
+  const normalX = normal.x;
+  const normalZ = normal.z;
+     if (normalY === 1) {
+      piecesColors[pieceId].up =colorName 
+    }
+    if (normalY ===-1) {
+      piecesColors[pieceId].down =colorName
+    }
+    if (normalX === -1) {
+      piecesColors[pieceId].left = colorName;
+    }
+    if (normalX === 1) {
+      piecesColors[pieceId].right = colorName;
+   
+    }
+    if (normalZ === 1) {
+      piecesColors[pieceId].front = colorName;
+    }
+    if (normalZ === -1) {
+      piecesColors[pieceId].back = colorName ; 
+    }
+    }
   const emptycube = () => {
     createUiPiecesWhite();
   };
-const addNewPiece = (pieceId, colorName) => {
-    piecesColors[pieceId].down = colorName;
-  
-}
+
   const setGeometrywhite = (piece, piececolor) => {
     const pieceGeoemtry = globals.pieceGeometry.clone();
     const normalAttribute = pieceGeoemtry.getAttribute("normal");
@@ -650,14 +690,16 @@ const addNewPiece = (pieceId, colorName) => {
   
     globals.renderer.render(globals.scene, globals.camera);
   };
+ 
   function onClick(event) {
+    if(globals.input){
     raycaster.setFromCamera(pointer, globals.camera);
     let intersects = raycaster.intersectObjects(globals.scene.children);
     if (intersects.length >0 &&intersects[0].object.name === "piece") {
-      inputCube(intersects[0].object.geometry.id);
+      inputCube(intersects[0].object.geometry.id -3 , intersects[0].face.normal);
       return;
-    }
-  }
+    }}}
+  
    
   const movePiecesBetweenGroups = (uiPieces, fromGroup, toGroup) => {
     if (uiPieces.length) {
@@ -787,7 +829,7 @@ const addNewPiece = (pieceId, colorName) => {
     globals.renderer.setPixelRatio(window.devicePixelRatio);
     globals.renderer.setSize(w, h);
     container.appendChild(globals.renderer.domElement);
-
+    globals.input = true;
     window.addEventListener("resize", () => {
       globals.renderer.setSize(container.offsetWidth, container.offsetHeight);
       globals.camera.aspect = container.offsetWidth / container.offsetHeight;
@@ -903,7 +945,10 @@ const addNewPiece = (pieceId, colorName) => {
     globals.controls.autoRotateSpeed = value;
     emitSettingsChanged();
   };
-
+  const setColor= (value) => {
+    globals.color = value;
+    emitSettingsChanged();
+  }
   const setAxesEnabled = (value) => {
     globals.axesEnabled = value;
     globals.axesEnabled ? addAxesHelper() : removeAxesHelper();
@@ -929,7 +974,9 @@ const addNewPiece = (pieceId, colorName) => {
     setAxesEnabled,
     getSettings,
     inputCube,
+    setColor,
     emptycube,
+    setInputState,
   };
 };
 

@@ -2,6 +2,7 @@ import { useEffect } from "react"
 import { useQueryParams } from "./useQueryParams"
 import { useThreeAppActions } from "./context"
 import SettingsButton from "./SettingsButton"
+import ColorInputButton from "./ColorInputButton"
 import Version from "./Version"
 
 const App = () => {
@@ -31,6 +32,7 @@ const App = () => {
     <>
 
       <SettingsButton />
+      <ColorInputButton />
       <Version />
     </>
   )
