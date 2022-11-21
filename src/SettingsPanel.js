@@ -152,11 +152,9 @@ const SettingsPanel = ({ onClose }) => {
       </StyledSettingsPanelHeader>
       <Divider />
       <StyledSettingsPanelBody>
-        <CubeSizeSetting value={settings.cubeSize} setValue={threeAppActions.setCubeSize} />
         <AnimationSpeedSetting value={settings.animationSpeed} setValue={threeAppActions.setAnimationSpeed} />
         <AutoRotateSetting value={settings.autoRotate} setValue={threeAppActions.setAutoRotate} />
         <AutoRotateSpeedSetting value={settings.autoRotateSpeed} setValue={threeAppActions.setAutoRotateSpeed} />
-        <AxesEnabledSetting value={settings.axesEnabled} setValue={threeAppActions.setAxesEnabled} />
       </StyledSettingsPanelBody>
     </StyledSettingsPanel>
   )

@@ -286,6 +286,7 @@ const threeApp = () => {
     color : undefined,
     input : undefined,
     cubeSolutions :"",
+    animationPause: false,
   };
 
   const SETTINGS_CHANGED_EVENT_NAME = "settings-changed";
@@ -800,6 +801,15 @@ const makeOneMove =  (move) => {
     ];
     return new THREE.AnimationClip(move.id, duration, tracks);
   };
+  const toogleAnimation = () => {
+    if (globals.animationPause === false) {
+      globals.animationPause = true;
+      globals.animationMixer.timeScale = 0;
+    }else{
+      globals.animationPause = false;
+      globals.animationMixer.timeScale = 1;
+    }
+  }
 
   const animateMoves = (moves, nextMoveIndex = 0) => {
     if (globals.cubeSizeChanged) {
@@ -821,6 +831,7 @@ const makeOneMove =  (move) => {
     );
 
     const onFinished = () => {
+      toogleAnimation()
       globals.animationMixer.removeEventListener("finished", onFinished);
       movePiecesBetweenGroups(
         uiPieces,
@@ -832,8 +843,9 @@ const makeOneMove =  (move) => {
       const rotationMatrix4 = makeRotationMatrix4(rotationMatrix3);
       for (const uiPiece of uiPieces) {
         uiPiece.applyMatrix4(rotationMatrix4);
-      }if (nextMoveIndex+1 < moves.length) {
+      }if (nextMoveIndex+1 < moves.length && globals.animationPause) {
       animateMoves (moves, nextMoveIndex+1)}
+      console.log(getColorsForInput())
     };
 
     globals.animationMixer.addEventListener("finished", onFinished);
@@ -855,7 +867,6 @@ const makeOneMove =  (move) => {
  
     animateMoves(Moves);
   };
-
   const scramble = () => {
     const movesString =globals.cubeSolutions;
     // here i will put the logic of the moves
@@ -867,7 +878,6 @@ const makeOneMove =  (move) => {
     console.log(
       `random moves: ${Moves.map((move) => move.id).join(" ")}`
     ); 
-    resetUiPieces(globals.cube);
     MakeMoves(Moves)
   };
 
@@ -953,12 +963,16 @@ const makeOneMove =  (move) => {
     console.log(getColorsForInput());
 
     const onDocumentKeyDownHandler = (e) => {
-      if (e.altKey || e.ctrlKey || e.metaKey || e.ShiftKey) return;
+     ;
+      if (e.altKey || e.ctrlKey || e.metaKey || e.ShiftKey || e.space) return;
       switch (e.key) {
         case "a":
           return toggleAxes();
         case "r":
           return toggleAutoRotate();
+        case " ":
+          return toogleAnimation();
+        
         default:
           return;
       }
