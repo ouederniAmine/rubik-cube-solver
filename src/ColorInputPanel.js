@@ -73,12 +73,7 @@ const ColorInputPanel = ({ onClose }) => {
 
       </ToggleButton>
     </ToggleButtonGroup>
-    <TextField
-          required
-          id="outlined-required"
-          label="cube solution"
-         onChange={(e) => setCubeSolutionMoves(e.target.value)}
-        />
+    
     <ToggleButtonGroup
       size="large" 
       onChange={handleToogleChange}    

@@ -7,6 +7,8 @@ import * as U from "./logic/utils";
 import { useState } from "react";
 import { norm, pi } from "mathjs";
 import MouseMeshInteraction from "./three_mmi"
+import axios from "axios";
+
 import { CasesSharp } from "@mui/icons-material";
 /*
 here's where i will put the explanation of every function in the three-app.js file:
@@ -621,6 +623,19 @@ const threeApp = () => {
     }   
     console.log(getColorsForInput());
   };
+
+  const getSolutions = () => {
+    
+    axios
+    .post("http://localhost:3001/CubeSolutions", {
+      cube: getColorsForInput()
+    })
+    .then((response) => {
+      console.log(response.data);
+      globals.cubeSolutions = response.data.replace(/[^a-zA-Z]+/g, '');
+    });
+  }
+
   const deletePreviousPuzzleGroup = (id) => {
     
     let n = 26;
@@ -868,6 +883,7 @@ const makeOneMove =  (move) => {
     animateMoves(Moves);
   };
   const scramble = () => {
+    getSolutions()
     const movesString =globals.cubeSolutions;
     // here i will put the logic of the moves
     const Moves =[] ;
