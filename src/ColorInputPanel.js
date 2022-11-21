@@ -28,6 +28,7 @@ const ColorInputPanel = ({ onClose }) => {
   }
   const resetToogle = () => {
     threeAppActions.setInputState(false)
+    threeAppActions.scramble()
   }
   const handleToogleChange = (event, newView) => {
     threeAppActions.setInputState(true)

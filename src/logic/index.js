@@ -109,18 +109,20 @@ const PER_CUBE_SIZE_DATA = new Map([
 
 export const getSolvedCube = cubeSize => {
   const perCubeSizeData = PER_CUBE_SIZE_DATA.get(cubeSize)
+  
   return perCubeSizeData.solvedCube
 }
 
 export const lookupMoveId = (cubeSize, id) => {
   const perCubeSizeData = PER_CUBE_SIZE_DATA.get(cubeSize)
-  return perCubeSizeData.moveIdsToMoves.get(id)
+  
+  return perCubeSizeData.moveIdsToMoves.get(0)
 }
 
-export const getRandomMove = cubeSize => {
+export const getMove = cubeSize => {
   const perCubeSizeData = PER_CUBE_SIZE_DATA.get(cubeSize)
-  const randomIndex = Math.floor(Math.random() * perCubeSizeData.moves.length)
-  return perCubeSizeData.moves[randomIndex]
+  console.log(perCubeSizeData.moves , "moves")
+  return perCubeSizeData.moves[0]
 }
 
 export const removeRedundantMoves = moves => {

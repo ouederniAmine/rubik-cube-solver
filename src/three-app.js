@@ -231,6 +231,7 @@ let piecesColors = [
     back: "-",
   },
 ];
+let previousPuzzle = undefined;
 
 const queryParamInt = (paramName, min, max, defaultValue) => {
   const clamp = (v) => {
@@ -508,21 +509,24 @@ const threeApp = () => {
       const uiPiece = createUiPiece(piece);
       globals.puzzleGroup.add(uiPiece);
     });
-    console.log(piecesColors);
+    previousPuzzle = globals.puzzleGroup;
   };
 
   const createUiPiecesWhite = () => {
+    globals.puzzleGroup.clear()
     globals.cube.forEach((piece) => {
       const color = COLOR_TABLE[piecesColors[piece.id]];
       const uiPiece = createWhitePiece(piece, color);
+      
       globals.puzzleGroup.add(uiPiece);
     });
   };
   const createUiPiecesInput = () => {
     globals.cube.forEach((piece) => {
       const uiPiece = createPiece(piece);
-      globals.puzzleGroup.add(uiPiece);
+      globals.puzzleGroup.add(uiPiece); 
     });
+
   };
   
 
@@ -574,13 +578,13 @@ const threeApp = () => {
       const uiPiece = findUiPiece(piece);
       resetUiPiece(uiPiece, piece);
     });
+    previousPuzzle = globals.puzzleGroup;
   };
   //function to input cube colors from user
   const inputCube = (id , normal) => {
     //still figuringid out how to get the colors from the user
     id --;
     var color = ""
-    console.log(id);
     switch(globals.color){
       case "white":
         color = "B";
@@ -602,10 +606,30 @@ const threeApp = () => {
         break;}
      const newId = id + 1;   
      if (newId !== 5 && newId !==11&& newId !==13 && newId !==14 && newId!==16 && newId !==22 ){
+      console.log(id, "id")
+      if ( id === -1){
+        id = 25;
+      }
       addColor(id, color , normal);
-      createUiPiecesInput();  }   
+      createUiPiecesInput();
+      deletePreviousPuzzleGroup(id)
+      console.log(globals.puzzleGroup.children.length ,"after input") 
+    }   
     
   };
+  const deletePreviousPuzzleGroup = (id) => {
+    
+    let n = 26;
+    let previ = 0;
+    for ( let i = 0; i < n; i++ ) {    globals.puzzleGroup.remove(globals.puzzleGroup.children[i-previ]); previ++;
+      
+    }
+   
+
+    
+    console.log(globals.puzzleGroup.children.length ,"after delete")
+
+  }
   const getColorsForInput = () => {
     var out =""
    const outL = piecesColors[6].back + piecesColors[3].back + piecesColors[0].back + piecesColors[14].back+ piecesColors[12].back+ piecesColors[9].back+ piecesColors[23].back+ piecesColors[20].back+piecesColors[17].back
@@ -632,10 +656,10 @@ const threeApp = () => {
     if (out[i] === "F") {
       out = out.replace("F", "y");    }
   }
-  console.log(outR);
     return out;
   }
   const addColor = (pieceId, colorName , normal) => {
+  console.log(globals.puzzleGroup.children.length, "add color");
   const normalY = normal.y;
   const normalX = normal.x;
   const normalZ = normal.z;
@@ -661,8 +685,12 @@ const threeApp = () => {
     }
   const emptycube = () => {
     createUiPiecesWhite();
+    previousPuzzle = globals.puzzleGroup;
   };
+const makeOneMove =  (move) => {
 
+
+}
   const setGeometrywhite = (piece, piececolor) => {
     const pieceGeoemtry = globals.pieceGeometry.clone();
     const normalAttribute = pieceGeoemtry.getAttribute("normal");
@@ -726,12 +754,13 @@ const threeApp = () => {
   };
  
   function onClick(event) {
-    console.log(getColorsForInput());
     if(globals.input){
     raycaster.setFromCamera(pointer, globals.camera);
     let intersects = raycaster.intersectObjects(globals.scene.children);
     if (intersects.length >0 &&intersects[0].object.name === "piece") {
-      inputCube(intersects[0].object.geometry.id -3 , intersects[0].face.normal);
+  
+      inputCube((intersects[0].object.geometry.id -3)%26 , intersects[0].face.normal);
+      
       return;
     }}}
   
@@ -829,30 +858,15 @@ const threeApp = () => {
   };
 
   const scramble = () => {
-    if (globals.cubeSizeChanged) {
-      globals.cubeSizeChanged = false;
-      globals.puzzleGroup.clear();
-      globals.animationGroup.clear();
-      globals.controls.reset();
-      const cameraX = globals.cubeSize + 1;
-      const cameraY = globals.cubeSize + 1;
-      const cameraZ = globals.cubeSize * 4;
-      globals.camera.position.set(cameraX, cameraY, cameraZ);
-      globals.camera.lookAt(new THREE.Vector3(0, 0, 0));
-      recreateUiPieces();
-    }
+   
     // here i will put the logic of the moves
-    const randomMoves = U.range(NUM_RANDOM_MOVES).map(() =>
-      L.getRandomMove(globals.cubeSize)
-    );
-    L.removeRedundantMoves(randomMoves);
+    const randomMoves = [L.getMove(globals.cubeSize)]
+
     console.log(
       `random moves: ${randomMoves.map((move) => move.id).join(" ")}`
-    );
-    console.log(L.getSolvedCube(globals.cubeSize));
-    globals.cube = L.makeMoves(randomMoves, L.getSolvedCube(globals.cubeSize));
+    ); 
     resetUiPieces(globals.cube);
-    setTimeout(showSolutionByCheating, BEFORE_DELAY, randomMoves);
+//    showSolutionByCheating(randomMoves)
   };
 
   const init = async () => {
@@ -933,6 +947,9 @@ const threeApp = () => {
     createUiPieces();
     setCubeSize(3);
     animate();
+    console.log("init done" , globals.puzzleGroup.children);
+  
+
     const onDocumentKeyDownHandler = (e) => {
       if (e.altKey || e.ctrlKey || e.metaKey || e.ShiftKey) return;
       switch (e.key) {
@@ -1009,7 +1026,7 @@ const threeApp = () => {
     getSettings,
     inputCube,
     setColor,
-    emptycube,
+    emptycube,scramble,
     setInputState,
   };
 };
