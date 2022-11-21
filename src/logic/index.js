@@ -118,11 +118,38 @@ export const lookupMoveId = (cubeSize, id) => {
   
   return perCubeSizeData.moveIdsToMoves.get(0)
 }
-
-export const getMove = cubeSize => {
+const RotationMoves = {
+  "L": 0,
+  "L2": 1,
+  "l": 2,
+  "M": 3,
+  "M2": 4,
+  "m": 5,
+  "r": 6,
+  "R2": 7,
+  "R": 8,
+  "F": 9,
+  "F2": 10,
+  "f": 11,
+  "S": 12,
+  "S2": 13,
+  "s": 14,
+  "b": 15,
+  "B2": 16,
+  "B": 17,
+  "d": 18,
+  "D2": 19,
+  "D": 20,
+  "E": 21,
+  "E2": 22,
+  "e": 23,
+  "U": 24,
+  "U2": 25,
+  "u": 26,
+} 
+export const getMove = (cubeSize , moveChar) => {
   const perCubeSizeData = PER_CUBE_SIZE_DATA.get(cubeSize)
-  console.log(perCubeSizeData.moves , "moves")
-  return perCubeSizeData.moves[0]
+  return perCubeSizeData.moves[RotationMoves[moveChar]]
 }
 
 export const removeRedundantMoves = moves => {

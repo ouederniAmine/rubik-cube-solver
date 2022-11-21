@@ -9,7 +9,7 @@ import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
 import ToggleButton from '@mui/material/ToggleButton';
 import * as React from 'react';
 import Button from '@mui/material/Button';
-
+import TextField from '@mui/material/TextField';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 
@@ -23,12 +23,19 @@ const ColorInputPanel = ({ onClose }) => {
   const threeAppActions = useThreeAppActions()
   const [settings, setSettings] = useState(threeAppActions.getSettings)
   const [color , setColor] = useState(settings.color)
+  const [cubeSolutionMoves, setCubeSolutionMoves] = useState("")
   const resetCube = () => {
     threeAppActions.emptycube()
   }
   const resetToogle = () => {
+
     threeAppActions.setInputState(false)
-    threeAppActions.scramble()
+    
+  }
+
+  const scramble = () => {
+    threeAppActions.setCubeSolutionMoves(cubeSolutionMoves)
+    threeAppActions.scramble()    
   }
   const handleToogleChange = (event, newView) => {
     threeAppActions.setInputState(true)
@@ -66,6 +73,12 @@ const ColorInputPanel = ({ onClose }) => {
 
       </ToggleButton>
     </ToggleButtonGroup>
+    <TextField
+          required
+          id="outlined-required"
+          label="cube solution"
+         onChange={(e) => setCubeSolutionMoves(e.target.value)}
+        />
     <ToggleButtonGroup
       size="large" 
       onChange={handleToogleChange}    
@@ -85,7 +98,9 @@ const ColorInputPanel = ({ onClose }) => {
       </ToggleButton>
     </ToggleButtonGroup>
     <br></br>
+    
     <Button size="large" onClick={resetCube}>Empty Cube</Button>
+    <Button size="large" onClick={scramble}>Solve it</Button>
     <Button size="large" onClick={resetToogle}>Done</Button>
 
       </StyledSettingsPanelBody>

@@ -285,10 +285,14 @@ const threeApp = () => {
     axesEnabled: false,
     color : undefined,
     input : undefined,
+    cubeSolutions :"",
   };
 
   const SETTINGS_CHANGED_EVENT_NAME = "settings-changed";
 
+  const setCubeSolutionMoves = (moves) => {
+    globals.cubeSolutions = moves;
+  }
  
 
   const eventEmitter = new EventEmitter();
@@ -308,6 +312,7 @@ const threeApp = () => {
       axesEnabled: globals.axesEnabled,
       color: globals.color,
       input: globals.input,
+      cubeSolutions: globals.cubeSolutions,
     };
   };
 
@@ -606,16 +611,14 @@ const threeApp = () => {
         break;}
      const newId = id + 1;   
      if (newId !== 5 && newId !==11&& newId !==13 && newId !==14 && newId!==16 && newId !==22 ){
-      console.log(id, "id")
       if ( id === -1){
         id = 25;
       }
       addColor(id, color , normal);
       createUiPiecesInput();
       deletePreviousPuzzleGroup(id)
-      console.log(globals.puzzleGroup.children.length ,"after input") 
     }   
-    
+    console.log(getColorsForInput());
   };
   const deletePreviousPuzzleGroup = (id) => {
     
@@ -627,7 +630,6 @@ const threeApp = () => {
    
 
     
-    console.log(globals.puzzleGroup.children.length ,"after delete")
 
   }
   const getColorsForInput = () => {
@@ -659,7 +661,6 @@ const threeApp = () => {
     return out;
   }
   const addColor = (pieceId, colorName , normal) => {
-  console.log(globals.puzzleGroup.children.length, "add color");
   const normalY = normal.y;
   const normalX = normal.x;
   const normalZ = normal.z;
@@ -831,8 +832,8 @@ const makeOneMove =  (move) => {
       const rotationMatrix4 = makeRotationMatrix4(rotationMatrix3);
       for (const uiPiece of uiPieces) {
         uiPiece.applyMatrix4(rotationMatrix4);
-      }
-      animateMoves(moves, nextMoveIndex + 1);
+      }if (nextMoveIndex+1 < moves.length) {
+      animateMoves (moves, nextMoveIndex+1)}
     };
 
     globals.animationMixer.addEventListener("finished", onFinished);
@@ -846,28 +847,30 @@ const makeOneMove =  (move) => {
     clipAction.play();
   };
 
-  const showSolutionByCheating = (randomMoves) => {
-    const solutionMoves = randomMoves
+  const MakeMoves = (Moves) => {
+    const sMoves = Moves
       .map((move) => move.oppositeMoveId)
       .map((id) => L.lookupMoveId(globals.cubeSize, id))
       .reverse();
-    console.log(
-      `solution moves: ${solutionMoves.map((move) => move.id).join(" ")}`
-    );
-    animateMoves(solutionMoves);
+ 
+    animateMoves(Moves);
   };
 
   const scramble = () => {
-   
+    const movesString =globals.cubeSolutions;
     // here i will put the logic of the moves
-    const randomMoves = [L.getMove(globals.cubeSize)]
-
+    const Moves =[] ;
+    for (let i = 0; i < movesString.length; i++) {
+      Moves.push(L.getMove(globals.cubeSize, movesString[i]))
+    }
+    console.log(Moves , "random moves");
     console.log(
-      `random moves: ${randomMoves.map((move) => move.id).join(" ")}`
+      `random moves: ${Moves.map((move) => move.id).join(" ")}`
     ); 
     resetUiPieces(globals.cube);
-//    showSolutionByCheating(randomMoves)
+    MakeMoves(Moves)
   };
+
 
   const init = async () => {
     const container = document.getElementById("visualisation-container");
@@ -934,7 +937,7 @@ const makeOneMove =  (move) => {
     globals.controls.maxDistance = 40.0;
     globals.controls.enableDamping = true;
     globals.controls.dampingFactor = 0.9;
-    globals.controls.autoRotate = true;
+    globals.controls.autoRotate = false;
     globals.controls.autoRotateSpeed = 1.0;
 
     globals.clock = new THREE.Clock();
@@ -947,8 +950,7 @@ const makeOneMove =  (move) => {
     createUiPieces();
     setCubeSize(3);
     animate();
-    console.log("init done" , globals.puzzleGroup.children);
-  
+    console.log(getColorsForInput());
 
     const onDocumentKeyDownHandler = (e) => {
       if (e.altKey || e.ctrlKey || e.metaKey || e.ShiftKey) return;
@@ -1028,6 +1030,7 @@ const makeOneMove =  (move) => {
     setColor,
     emptycube,scramble,
     setInputState,
+    setCubeSolutionMoves
   };
 };
 
