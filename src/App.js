@@ -4,7 +4,7 @@ import { useThreeAppActions } from "./context"
 import SettingsButton from "./SettingsButton"
 import ColorInputButton from "./ColorInputButton"
 import Version from "./Version"
-
+import Title from "./Title"
 const App = () => {
 
   const threeAppActions = useThreeAppActions()
@@ -29,8 +29,7 @@ const App = () => {
   }, [threeAppActions, queryParams])
 
   return (
-    <>
-
+    <> <Title />
       <SettingsButton />
       <ColorInputButton />
       <Version />

@@ -18,6 +18,7 @@ const ColorInputButton = () => {
   return (
     <>
       <StyledColorInputIcon onClick={openDrawer} />
+
       <Drawer anchor="left" open={isDrawerOpen} onClose={closeDrawer}>
         <ColorInputPanel onClose={closeDrawer} />
       </Drawer>

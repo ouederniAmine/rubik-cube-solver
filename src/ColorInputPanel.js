@@ -96,7 +96,7 @@ const ColorInputPanel = ({ onClose }) => {
     
     <Button size="large" onClick={resetCube}>Empty Cube</Button>
     <Button size="large" onClick={scramble}>Solve it</Button>
-    <Button size="large" onClick={resetToogle}>Done</Button>
+    <Button size="large" onClick={resetToogle}>Input Done</Button>
 
       </StyledSettingsPanelBody>
     </StyledSettingsPanel>
