@@ -627,7 +627,7 @@ const threeApp = () => {
   const getSolutions = () => {
     
     axios
-    .post("http://localhost:3001/CubeSolutions", {
+    .post("http://20.216.151.46:3001/CubeSolutions", {
       cube: getColorsForInput()
     })
     .then((response) => {
