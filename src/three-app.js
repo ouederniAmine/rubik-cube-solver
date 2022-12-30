@@ -4,12 +4,8 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
 import * as L from "./logic";
 import * as U from "./logic/utils";
-import { useState } from "react";
-import { norm, pi } from "mathjs";
-import MouseMeshInteraction from "./three_mmi"
 import axios from "axios";
 
-import { CasesSharp } from "@mui/icons-material";
 /*
 here's where i will put the explanation of every function in the three-app.js file:
 - init: this function is called when the page is loaded, it creates the scene, the camera, the renderer, the controls, the lights, the objects, the event listeners, and the animation loop
@@ -233,7 +229,6 @@ let piecesColors = [
     back: "-",
   },
 ];
-let previousPuzzle = undefined;
 
 const queryParamInt = (paramName, min, max, defaultValue) => {
   const clamp = (v) => {
@@ -324,8 +319,6 @@ const threeApp = () => {
   };
   
   globals.animationSpeed = queryParamInt("animationSpeed", 100, 1000, 750);
-  const NUM_RANDOM_MOVES = queryParamInt("randomMoves", 10, 100, 25);
-  const BEFORE_DELAY = queryParamInt("beforeDelay", 0, 5000, 2000);
   const AFTER_DELAY = queryParamInt("afterDelay", 0, 5000, 2000);
 
   const makeRotationMatrix4 = (rotationMatrix3) => {
@@ -507,17 +500,12 @@ const threeApp = () => {
     );
     return pieceGeoemtry;
   };
-  const recreateUiPieces = () => {
-    globals.cube = L.getSolvedCube(globals.cubeSize);
-    createUiPieces();
-  };
 
   const createUiPieces = () => {
     globals.cube.forEach((piece) => {
       const uiPiece = createUiPiece(piece);
       globals.puzzleGroup.add(uiPiece);
     });
-    previousPuzzle = globals.puzzleGroup;
   };
 
   const createUiPiecesWhite = () => {
@@ -581,13 +569,7 @@ const threeApp = () => {
   const findUiPiece = (piece) =>
     globals.puzzleGroup.children.find((child) => child.userData === piece.id);
 
-  const resetUiPieces = (cube) => {
-    cube.forEach((piece) => {
-      const uiPiece = findUiPiece(piece);
-      resetUiPiece(uiPiece, piece);
-    });
-    previousPuzzle = globals.puzzleGroup;
-  };
+ 
   //function to input cube colors from user
   const inputCube = (id , normal) => {
     //still figuringid out how to get the colors from the user
@@ -702,12 +684,8 @@ const threeApp = () => {
     }
   const emptycube = () => {
     createUiPiecesWhite();
-    previousPuzzle = globals.puzzleGroup;
   };
-const makeOneMove =  (move) => {
 
-
-}
   const setGeometrywhite = (piece, piececolor) => {
     const pieceGeoemtry = globals.pieceGeometry.clone();
     const normalAttribute = pieceGeoemtry.getAttribute("normal");
@@ -875,10 +853,7 @@ const makeOneMove =  (move) => {
   };
 
   const MakeMoves = (Moves) => {
-    const sMoves = Moves
-      .map((move) => move.oppositeMoveId)
-      .map((id) => L.lookupMoveId(globals.cubeSize, id))
-      .reverse();
+
  
     animateMoves(Moves);
   };
