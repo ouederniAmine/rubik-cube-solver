@@ -1,15 +1,11 @@
-import { useEffect, useState } from "react"
-import { Divider, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Slider, Switch, Typography } from "@mui/material"
+import { Divider,Typography } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import { StyledSettingsPanel, StyledSettingsPanelHeader, StyledSettingsPanelBody } from "./SettingsPanel.styles"
 import { useThreeAppActions } from "./context"
-import ViewListIcon from '@mui/icons-material/ViewList';
-import ViewModuleIcon from '@mui/icons-material/ViewModule';
-import ViewQuiltIcon from '@mui/icons-material/ViewQuilt';
+
 import ToggleButton from '@mui/material/ToggleButton';
 import * as React from 'react';
 import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 
 
@@ -21,9 +17,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 const ColorInputPanel = ({ onClose }) => {
 
   const threeAppActions = useThreeAppActions()
-  const [settings, setSettings] = useState(threeAppActions.getSettings)
-  const [color , setColor] = useState(settings.color)
-  const [cubeSolutionMoves, setCubeSolutionMoves] = useState("")
+
   const resetCube = () => {
     threeAppActions.emptycube()
   }
@@ -34,18 +28,13 @@ const ColorInputPanel = ({ onClose }) => {
   }
 
   const scramble = () => {
-    threeAppActions.setCubeSolutionMoves(cubeSolutionMoves)
     threeAppActions.scramble()    
   }
   const handleToogleChange = (event, newView) => {
     threeAppActions.setInputState(true)
     threeAppActions.setColor(newView)
   }
-  useEffect(() => {
-    threeAppActions.addSettingsChangedListener(setSettings)
-    return () => threeAppActions.removeSettingsChangedListener(setSettings)
-  }, [threeAppActions])
-
+ 
   return (
     <StyledSettingsPanel>
       <StyledSettingsPanelHeader>

@@ -1,7 +1,7 @@
 import React from "react"
 import ReactDOM from "react-dom"
 import { injectGlobal } from "@emotion/css"
-import { Button, createTheme, ThemeProvider } from "@mui/material"
+import {  createTheme, ThemeProvider } from "@mui/material"
 import { ThreeAppActionsProvider } from "./context"
 import App from "./App"
 import * as serviceWorkerRegistration from "./serviceWorkerRegistration"

@@ -1,35 +1,8 @@
 import { useEffect, useState } from "react"
-import { Divider, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, Slider, Switch, Typography } from "@mui/material"
+import { Divider, FormControl, FormControlLabel, FormLabel, Slider, Switch, Typography } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import { StyledSettingsPanel, StyledSettingsPanelHeader, StyledSettingsPanelBody } from "./SettingsPanel.styles"
 import { useThreeAppActions } from "./context"
-const CubeSizeSetting = ({ value, setValue }) => {
-
-  const handleChange = event => {
-    setValue(Number(event.target.value))
-  }
-
-  return (
-    <div>
-      <FormControl sx={{ mt: "2rem" }}>
-        <FormLabel id="cube-size-label">Cube Size</FormLabel>
-        <RadioGroup
-          row
-          aria-labelledby="cube-size-label"
-          name="cube-size-group"
-          value={value}
-          onChange={handleChange}
-        >
-          <FormControlLabel value="2" control={<Radio size="small" />} label="2" />
-          <FormControlLabel value="3" control={<Radio size="small" />} label="3" />
-          <FormControlLabel value="4" control={<Radio size="small" />} label="4" />
-          <FormControlLabel value="5" control={<Radio size="small" />} label="5" />
-        </RadioGroup>
-      </FormControl>
-    </div>
-  )
-}
-
 const AnimationSpeedSetting = ({ value, setValue }) => {
 
   const handleChange = event => {
@@ -107,32 +80,6 @@ const AutoRotateSpeedSetting = ({ value, setValue }) => {
   )
 }
 
-const AxesEnabledSetting = ({ value, setValue }) => {
-
-  const handleChange = event => {
-    setValue(event.target.checked)
-  }
-
-  return (
-    <div>
-      <FormControl>
-        <FormLabel id="axes-enabled-label">Show Axes</FormLabel>
-        <FormControlLabel
-          sx={{ mt: ".25rem" }}
-          control={
-            <Switch
-              aria-labelledby="axes-enabled-label"
-              size="small"
-              checked={value}
-              onClick={handleChange}
-            />
-          }
-          label={value ? "On" : "Off"}
-        />
-      </FormControl>
-    </div>
-  )
-}
 
 const SettingsPanel = ({ onClose }) => {
 
