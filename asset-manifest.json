@@ -1,11 +1,11 @@
 {
   "files": {
-    "main.js": "/rubik-cube-solver/static/js/main.61b39c61.js",
-    "service-worker.js": "/rubik-cube-solver/service-worker.js",
-    "index.html": "/rubik-cube-solver/index.html",
-    "main.61b39c61.js.map": "/rubik-cube-solver/static/js/main.61b39c61.js.map"
+    "main.js": "/rubiks-cube/static/js/main.a7ab754c.js",
+    "service-worker.js": "/rubiks-cube/service-worker.js",
+    "index.html": "/rubiks-cube/index.html",
+    "main.a7ab754c.js.map": "/rubiks-cube/static/js/main.a7ab754c.js.map"
   },
   "entrypoints": [
-    "static/js/main.61b39c61.js"
+    "static/js/main.a7ab754c.js"
   ]
 }
