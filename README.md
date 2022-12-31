@@ -20,7 +20,7 @@ When the server starts , go back to the front end directory and :
 ```bash
   npm start
 ```
-now you can check your http://localhost:3000/
+now you can check live deployement at  : https://ouederniamine.github.io/rubiks-cube/
 
 ## Authors
 
