@@ -614,7 +614,7 @@ const threeApp = () => {
     })
     .then((response) => {
       if("cube not verified" ===response.data.trim()){
-        alert("Incorrect Cube \nPlease try again");
+        alert("Incorrect Cube \n Please try again");
       }
       globals.cubeSolutions = response.data.replace(/[^a-zA-Z]+/g, '');
     });
