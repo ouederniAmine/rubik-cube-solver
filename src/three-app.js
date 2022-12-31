@@ -613,7 +613,9 @@ const threeApp = () => {
       cube: getColorsForInput()
     })
     .then((response) => {
-      console.log(response.data);
+      if("cube not verified" ===response.data.trim()){
+        alert("Incorrect Cube \nPlease try again");
+      }
       globals.cubeSolutions = response.data.replace(/[^a-zA-Z]+/g, '');
     });
   }
